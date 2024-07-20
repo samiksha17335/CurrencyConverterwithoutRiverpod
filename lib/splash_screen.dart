@@ -3,24 +3,30 @@ import 'dart:developer';
 
 import 'package:currency_converter/constants.dart';
 import 'package:currency_converter/currency_converter_screen.dart';
+import 'package:currency_converter/currency_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  Map<String,dynamic> currencyRate={};
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  //Map<String,dynamic> currencyRate={};
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCurrencyData();
-    //getCurrenciesList();
+    //getCurrencyData();
+    Future.microtask(()async{
+      await ref.read(currencyProvider.notifier).getCurrencyData(false).then((value){
+        Navigator.of(context).push(MaterialPageRoute(builder: (_)=>CurrencyConverterScreen()));
+      });
+    });
   }
 
   @override
@@ -45,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Future getCurrenciesList() async{
+  /*Future getCurrenciesList() async{
     String url='https://api.freecurrencyapi.com/v1/currencies?apikey=$currency_api_key&';
     Uri uri=Uri.parse(url);
     final response=await http.get(uri);
@@ -82,6 +88,6 @@ class _SplashScreenState extends State<SplashScreen> {
     //print(response.body);
     //log(decodeData.body);
 
-  }
+  }*/
 
 }

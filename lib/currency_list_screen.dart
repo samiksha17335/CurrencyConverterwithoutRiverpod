@@ -1,20 +1,27 @@
+import 'package:currency_converter/currency_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CurrencyListScreen extends StatefulWidget {
-  const CurrencyListScreen({super.key, required this.currencyRate});
-  final Map<String,dynamic> currencyRate;
+class CurrencyListScreen extends ConsumerStatefulWidget {
+  const CurrencyListScreen({super.key,
+    //required this.currencyRate
+  });
+  //final Map<String,dynamic> currencyRate;
   @override
-  State<CurrencyListScreen> createState() => _CurrencyListScreenState();
+  ConsumerState<CurrencyListScreen> createState() => _CurrencyListScreenState();
 }
 
-class _CurrencyListScreenState extends State<CurrencyListScreen> {
+class _CurrencyListScreenState extends ConsumerState<CurrencyListScreen> {
   List currencyList=[];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    currencyList=widget.currencyRate.entries.toList();
+    //currencyList=widget.currencyRate.entries.toList();
+    ref.read(currencyProvider.notifier).getCurrencyData(true);
+    final currencyNotifier=ref.read(currencyProvider);
+    currencyList=currencyNotifier.currencyRate!.entries.toList();
   }
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,7 @@ class _CurrencyListScreenState extends State<CurrencyListScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
+
                   child: ListTile(
                     leading: const Icon(Icons.monetization_on,
                     color: Colors.white,),
@@ -48,6 +56,7 @@ class _CurrencyListScreenState extends State<CurrencyListScreen> {
                       fontSize: 20,
                       fontWeight: FontWeight.bold
                     ),),
+
                     subtitle: Text("${currencyList[index].value}",
                       style: const TextStyle(
                         color: Colors.white,

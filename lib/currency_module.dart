@@ -1,4 +1,4 @@
-/*
+
 class CurrencyModule{
   final Map<String,dynamic>? currencyRate;
   String currencyResult;
@@ -10,4 +10,14 @@ class CurrencyModule{
     required this.selectedCurrency
   } );
 
-}*/
+  CurrencyModule copyWith({
+     Map<String,dynamic>? currencyRate,
+    String? currencyResult,
+    String? selectedCurrency,
+  }) {
+    return CurrencyModule(
+        currencyRate: currencyRate ?? this.currencyRate,
+        currencyResult: currencyResult ?? this.currencyResult,
+        selectedCurrency: selectedCurrency ?? this.selectedCurrency);
+  }
+}

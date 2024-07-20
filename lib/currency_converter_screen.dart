@@ -1,16 +1,20 @@
 import 'package:currency_converter/currency_list_screen.dart';
+import 'package:currency_converter/currency_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CurrencyConverterScreen extends StatefulWidget {
-  CurrencyConverterScreen({super.key, required this.currencyRate});
-  final Map<String,dynamic> currencyRate;
+class CurrencyConverterScreen extends ConsumerStatefulWidget {
+  CurrencyConverterScreen({super.key,
+    //required this.currencyRate
+  });
+  //final Map<String,dynamic> currencyRate;
   @override
-  State<CurrencyConverterScreen> createState() => _CurrencyConverterScreenState();
+  ConsumerState<CurrencyConverterScreen> createState() => _CurrencyConverterScreenState();
 }
 
-class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
+class _CurrencyConverterScreenState extends ConsumerState<CurrencyConverterScreen> {
 
 
   @override
@@ -18,19 +22,25 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
     // TODO: implement initState
 
     super.initState();
-    dropdownItems=widget.currencyRate.entries.map((e){
-      return DropdownMenuItem(child: Text(e.key),
-      value: e.key);
+    final currencyNotifier=ref.read(currencyProvider);
+
+    dropdownItems=currencyNotifier.currencyRate!.entries.map((e){
+      return DropdownMenuItem(
+          child: Text(e.key),
+           value: e.key);
 
     }).toList();
 
   }
   List<DropdownMenuItem> dropdownItems=[];
   final currencyTextEditingController=TextEditingController();
-  String currencyResult='0.0';
-  String selectedCurrency="USD";
+  //String currencyResult='0.0';
+  //String selectedCurrency="USD";
+
   @override
   Widget build(BuildContext context) {
+
+    final currencyNotifier=ref.watch(currencyProvider);
     return Scaffold(
     backgroundColor: Colors.blue,
       appBar: AppBar(
@@ -45,7 +55,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
         actions: [
           IconButton(onPressed: (){
             Navigator.of(context).push(MaterialPageRoute(builder: (_)=>
-            CurrencyListScreen(currencyRate: widget.currencyRate)));
+            CurrencyListScreen()));
           },
           icon: const Icon(Icons.currency_bitcoin))
         ],
@@ -103,6 +113,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   ),
                 ),
               ),
+
               DropdownButton(
                 iconEnabledColor: Colors.white,
                 style: const TextStyle(
@@ -111,14 +122,17 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   fontWeight: FontWeight.bold
                 ),
                 dropdownColor: Colors.blue,
-                value: selectedCurrency,
-                  items: dropdownItems, onChanged: (value){
-                selectedCurrency=value.toString();
-                setState(() {
-
-                });
+                value: currencyNotifier.selectedCurrency,
+                  items: dropdownItems,
+                  onChanged: (value){
+                //selectedCurrency=value.toString();
+                    ref.read(currencyProvider.notifier).updateSelectedCurrency(value);
+                // setState(() {
+                //
+                // });
               }),
-              Text(currencyResult,
+              Text(
+                currencyNotifier.currencyResult,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -135,16 +149,19 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
               height: 50,
               width: double.infinity,
               child: ElevatedButton(onPressed: (){
-                final rate=widget.currencyRate[selectedCurrency];
-                if(currencyTextEditingController.text.isEmpty){
-                  return;
-                }
-                final inrCurrency=int.parse(currencyTextEditingController.text);
-                currencyResult=(inrCurrency*rate).toStringAsFixed(2);
-                setState(() {
-
-                });
-              }, child: const Text("convert",
+                ref.read(currencyProvider.notifier).calculateCurrencyData(
+                    currencyNotifier.selectedCurrency, currencyTextEditingController.text);
+                //final rate=widget.currencyRate[selectedCurrency];
+                // if(currencyTextEditingController.text.isEmpty){
+                //   return;
+                // }
+                // final inrCurrency=int.parse(currencyTextEditingController.text);
+                // currencyResult=(inrCurrency*rate).toStringAsFixed(2);
+                // setState(() {
+                //
+                // });
+              },
+               child: const Text("convert",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold
